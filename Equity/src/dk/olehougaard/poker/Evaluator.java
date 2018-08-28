@@ -29,9 +29,11 @@ public class Evaluator {
 	private static final long WIDE_PAIR_MASK = SPADE_POSITION | CLUB_POSITION;
 	
 	public static final int UNPAIRED_INDEX = 0;
-	public static final int LEAST_SIGNIFICANT_PAIR_INDEX = UNPAIRED_INDEX + ACE_INDEX + 1;
-	public static final int MOST_SIGNIFICANT_PAIR_INDEX = LEAST_SIGNIFICANT_PAIR_INDEX + 4;
-	public static final int TWO_PAIR_INDEX = MOST_SIGNIFICANT_PAIR_INDEX + 4;
+	public static final int LSP_INDEX = UNPAIRED_INDEX + ACE_INDEX + 1;
+	private static final long LSP_POS = 1L << LSP_INDEX;
+	public static final int MSP_INDEX = LSP_INDEX + 4;
+	private static final long MSP_POS = 1L << MSP_INDEX;
+	public static final int TWO_PAIR_INDEX = MSP_INDEX + 4;
 	public static final int TRIP_INDEX = TWO_PAIR_INDEX + 1;
 	public static final int STRAIGHT_INDEX = TRIP_INDEX + 1;
 	public static final int FLUSH_INDEX = STRAIGHT_INDEX + 1;
@@ -39,9 +41,10 @@ public class Evaluator {
 	public static final int QUAD_INDEX = BOAT_INDEX + 1;
 	public static final int SF_INDEX = QUAD_INDEX + 1;
 
-	public static final long UNPAIRED_MASK = (1L << LEAST_SIGNIFICANT_PAIR_INDEX) - 1; 
-	public static final long LEAST_SIGNIFICANT_PAIR_MASK = 0xF << LEAST_SIGNIFICANT_PAIR_INDEX;
-	public static final long MOST_SIGNIFICANT_PAIR_MASK = 0xF << MOST_SIGNIFICANT_PAIR_INDEX;
+	public static final long UNPAIRED_MASK = LSP_POS - 1; 
+	public static final long LEAST_SIGNIFICANT_PAIR_MASK = 0xF << LSP_INDEX;
+	public static final long MOST_SIGNIFICANT_PAIR_MASK = 0xF << MSP_INDEX;
+	public static final long FLUSH_MASK = 1L << FLUSH_INDEX;
 	public static final long BOAT_MASK = 1L << BOAT_INDEX;
 	public static final long QUAD_MASK = 1L << QUAD_INDEX;
 	public static final long SF_MASK = 1L << SF_INDEX;
@@ -95,7 +98,7 @@ public class Evaluator {
 					long rest = valuesOnly(hand) & ~(1L << i);
 					long kicker = 1L << ACE_INDEX;
 					while((kicker & rest) == 0) kicker >>= 1;
-					return QUAD_MASK | ((i - DEUCE_INDEX + 2) * (1L << MOST_SIGNIFICANT_PAIR_INDEX)) | kicker;
+					return QUAD_MASK | ((i - DEUCE_INDEX + 2) * MSP_POS) | kicker;
 				}
 			}
 		} else if (pair_signature[TRIPS] >= 1 && pair_signature[PAIRS] >= 1 || pair_signature[TRIPS] >= 2) {
@@ -104,10 +107,34 @@ public class Evaluator {
 					pairs[i] = 0;
 					for(int j = ACE_INDEX; j >= DEUCE_INDEX; j--) {
 						if (pairs[j] >= PAIRS_IN_PAIR) {
-							return BOAT_MASK | ((i - DEUCE_INDEX + 2) * (1L << MOST_SIGNIFICANT_PAIR_INDEX)) | ((j - DEUCE_INDEX + 2) * (1L << LEAST_SIGNIFICANT_PAIR_INDEX));
+							return BOAT_MASK | ((i - DEUCE_INDEX + 2) * MSP_POS) | ((j - DEUCE_INDEX + 2) * LSP_POS);
 						}
 					}
 				}
+			}
+		}
+		return 0L;
+	}
+	
+	private static final long HAMMING8  = (1L << 8) - 1;
+	private static final long HAMMING4  = HAMMING8 ^ (HAMMING8 << 4);
+	private static final long HAMMING2  = HAMMING4 ^ (HAMMING4 << 2);
+	private static final long HAMMING1  = HAMMING2 ^ (HAMMING2 << 1);
+	
+	private static long evaluateFlush(long hand) {
+		for(long mask = SPADE_MASK, index = SPADE_INDEX; mask != 0; mask >>>= BITS_PER_SUIT, index >>>= BITS_PER_SUIT) {
+			long cardsInSuit = (hand & mask) >> index;
+			long bits = cardsInSuit;
+			bits = (bits & HAMMING1) + ((bits >> 1) & HAMMING1);
+			bits = (bits & HAMMING2) + ((bits >> 2) & HAMMING2);
+			bits = (bits & HAMMING4) + ((bits >> 4) & HAMMING4);
+			bits = (bits & HAMMING8) + ((bits >> 8) & HAMMING8);
+			if (bits >= 5) {
+				while(bits > 5) {
+					cardsInSuit &= cardsInSuit - 1;
+					bits--;
+				}
+				return FLUSH_MASK | cardsInSuit;
 			}
 		}
 		return 0L;
@@ -122,6 +149,8 @@ public class Evaluator {
 		if (sf != 0) return sf;
 		long pairs = evaluatePaired(hand);
 		if ((pairs & (QUAD_MASK | BOAT_MASK)) != 0) return pairs;
+		long flush = evaluateFlush(hand);
+		if ((flush & FLUSH_MASK) != 0) return flush;
 		return valuesOnly(hand);
 	}
 }
