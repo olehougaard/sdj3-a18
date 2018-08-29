@@ -44,6 +44,7 @@ public class Evaluator {
 	public static final long UNPAIRED_MASK = LSP_POS - 1; 
 	public static final long LEAST_SIGNIFICANT_PAIR_MASK = 0xF << LSP_INDEX;
 	public static final long MOST_SIGNIFICANT_PAIR_MASK = 0xF << MSP_INDEX;
+	public static final long STRAIGHT_MASK = 1L << STRAIGHT_INDEX;
 	public static final long FLUSH_MASK = 1L << FLUSH_INDEX;
 	public static final long BOAT_MASK = 1L << BOAT_INDEX;
 	public static final long QUAD_MASK = 1L << QUAD_INDEX;

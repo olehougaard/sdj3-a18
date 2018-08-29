@@ -218,4 +218,13 @@ class EvaluatorTest {
 		long sixFlush = Hand.createHand("Qc", "Jd", "Tc", "Jc", "Ac", "3c", "2c");
 		assertTrue(Evaluator.evaluate(fiveFlush) == Evaluator.evaluate(sixFlush));
 	}
+	
+	//STRAIGHT
+	@Test
+	void aStraightDrawIsNotAStraigh() {
+		long draw = Hand.createHand("Qs", "Jd", "Tc", "Jc", "Kc", "3h", "4d");
+		assertEquals(0L, Evaluator.evaluate(draw) & STRAIGHT_MASK);
+	}
+	
+	
 }
