@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class RemoteCarBase extends UnicastRemoteObject implements CarBase {
+	private static final long serialVersionUID = 1L;
+
 	public RemoteCarBase() throws RemoteException {
 	}
 
