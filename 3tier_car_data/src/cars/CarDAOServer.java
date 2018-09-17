@@ -51,6 +51,11 @@ public class CarDAOServer extends UnicastRemoteObject implements CarDAO {
 	}
 
 	@Override
+	public Collection<CarDTO> readAllCheaperThan(Money money) throws RemoteException {
+		return helper.map((rs) -> createCar(rs), "SELECT * FROM car WHERE price_amount < ? AND price_currency = ?", money.getAmount(), money.getCurrency());
+	}
+
+	@Override
 	public void update(CarDTO car) throws RemoteException {
 		helper.executeUpdate("UPDATE car SET model=?, year=?, price_amount=?, price_currency=? WHERE license_number = ?", 
 				car.getModel(), car.getYear(), car.getPrice().getAmount(), car.getPrice().getCurrency(), car.getLicenseNumber());
@@ -73,7 +78,7 @@ public class CarDAOServer extends UnicastRemoteObject implements CarDAO {
 		DatabaseHelper<CarDTO> helper = new DatabaseHelper<>("jdbc:postgresql://localhost:5432/postgres?currentSchema=car_base", "postgres", "password");
 		CarDAOServer carDAOServer = new CarDAOServer(helper);
 		carDAOServer.createTestDB();
-		Registry registry = LocateRegistry.getRegistry(1099);
+		Registry registry = LocateRegistry.createRegistry(1099);
 		registry.rebind("carDao", carDAOServer);
 	}
 }
