@@ -1,3 +1,7 @@
+DROP SCHEMA bank CASCADE;
+CREATE SCHEMA bank;
+SET SCHEMA 'bank';
+
 CREATE DOMAIN Currency CHAR(3) CHECK (VALUE = UPPER(VALUE));
 CREATE DOMAIN MoneyAmount DECIMAL(12, 2);
 CREATE DOMAIN RegNumber DECIMAL(4) CHECK (VALUE > 0);
@@ -19,10 +23,12 @@ CREATE TABLE Customer(
   name VARCHAR(100) NOT NULL,
   address VARCHAR(100) NOT NULL,
   PRIMARY KEY(cpr));
-  
+
+CREATE SEQUENCE acc_number_seq INCREMENT 1 START WITH 1;
+
 CREATE TABLE Account(
+  account_number AccountNumber DEFAULT (nextval('acc_number_seq')),
   reg_number RegNumber,
-  account_number AccountNumber,
   customer CHAR(10) NOT NULL,
   balance MoneyAmount NOT NULL DEFAULT 0,
   currency Currency NOT NULL,
@@ -34,7 +40,7 @@ CREATE TABLE Transaction(
   transaction_id SERIAL,
   amount MoneyAmount NOT NULL,
   currency Currency NOT NULL,
-  transaction_type VARCHAR(10) NOT NULL CHECK transaction_type IN ('Deposit', 'Withdrawal', 'Transfer'),
+  transaction_type VARCHAR(10) NOT NULL CHECK(transaction_type IN ('Deposit', 'Withdrawal', 'Transfer')),
   transaction_text VARCHAR(200) NOT NULL,
   primary_reg_number RegNumber NOT NULL,
   primary_account_number AccountNumber NOT NULL,
@@ -57,3 +63,7 @@ INSERT INTO Customer VALUES
   ('1234567890', 'Me', 'My address'),
   ('1122334455', 'Other guy', 'Other address');
 
+INSERT INTO Branch VALUES
+  (1234, 'Chr. M Østergaardsvej 4'),
+  (1122, '461 Ocean Boulevard');
+  

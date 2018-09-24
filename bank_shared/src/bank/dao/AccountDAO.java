@@ -9,7 +9,7 @@ import bank.model.AccountNumber;
 import bank.model.Customer;
 
 public interface AccountDAO extends Remote {
-	public Account create(AccountNumber accountNumber, Customer customer, String currency) throws RemoteException;
+	public Account create(int regNumber, Customer customer, String currency) throws RemoteException;
 	public Account read(AccountNumber accountNumber) throws RemoteException;
 	public Collection<Account> readAccountsFor(Customer customer) throws RemoteException;
 	public void update(Account account) throws RemoteException;

@@ -1,17 +1,17 @@
 package bank.model.transaction;
 
-import bank.model.AccountNumber;
+import bank.model.Account;
 import bank.model.Money;
 
 public abstract class AbstractTransaction implements Transaction {
 	private static final long serialVersionUID = 1L;
 	private Money amount;
-	private AccountNumber accountNumber;
+	private Account account;
 	private String text;
 
-	public AbstractTransaction(Money amount, AccountNumber accountNumber, String text) {
+	public AbstractTransaction(Money amount, Account account, String text) {
 		this.amount = amount;
-		this.accountNumber = accountNumber;
+		this.account = account;
 		this.text = text;
 	}
 
@@ -19,8 +19,8 @@ public abstract class AbstractTransaction implements Transaction {
 		return amount;
 	}
 
-	public AccountNumber getAccountNumber() {
-		return accountNumber;
+	public Account getAccount() {
+		return account;
 	}
 	
 	@Override

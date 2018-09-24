@@ -1,6 +1,7 @@
 package bank;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
@@ -11,7 +12,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import bank.dao.ExchangeRateDAO;
 import bank.model.Account;
 import bank.model.Customer;
 import bank.model.Money;
@@ -19,25 +19,25 @@ import bank.model.transaction.DepositTransaction;
 import bank.model.transaction.TransferTransaction;
 
 public class TransferTest {
-	private ExchangeRateDAO hq;
-	private Branch primaryBranch;
+	private Branch branch;
 	private Account primaryAccount;
 	private Account secondaryAccount;
 
 	@Before
 	public void setUp() throws Exception {
 		Registry registry = LocateRegistry.getRegistry(1099);
-		primaryBranch = (Branch) registry.lookup("Branch 1");
-		Customer customer = primaryBranch.getCustomer("1234567890");
-		primaryAccount = primaryBranch.createAccount(customer, "DKK");
-		Customer other = primaryBranch.getCustomer("1122334455");
-		secondaryAccount = primaryBranch.createAccount(other, "EUR");
+		branch = (Branch) registry.lookup("Branch 1");
+		Customer customer = branch.getCustomer("1234567890");
+		primaryAccount = branch.createAccount(customer, "DKK");
+		assertNotNull(primaryAccount);
+		Customer other = branch.getCustomer("1122334455");
+		secondaryAccount = branch.createAccount(other, "EUR");
 	}
 	
 	@After
 	public void tearDown() throws Exception {
-		primaryBranch.cancelAccount(primaryAccount.getAccountNumber());
-		primaryBranch.cancelAccount(secondaryAccount.getAccountNumber());
+		branch.cancelAccount(primaryAccount);
+		branch.cancelAccount(secondaryAccount);
 	}
 	
 	@Test
@@ -45,13 +45,13 @@ public class TransferTest {
 		Money startingAmount = new Money(new BigDecimal(10000), "DKK");
 		Money transferAmount = new Money(new BigDecimal(1000), "DKK");
 		Money remainingAmount = new Money(new BigDecimal(9000), "DKK");
-		primaryBranch.execute(new DepositTransaction(startingAmount, primaryAccount.getAccountNumber()));
-		primaryAccount = primaryBranch.getAccount(primaryAccount.getAccountNumber());
+		branch.execute(new DepositTransaction(startingAmount, primaryAccount));
+		primaryAccount = branch.getAccount(primaryAccount.getAccountNumber());
 		assertEquals(startingAmount, primaryAccount.getBalance());
-		primaryBranch.execute(new TransferTransaction(transferAmount, primaryAccount.getAccountNumber(), secondaryAccount.getAccountNumber()));
-		primaryAccount = primaryBranch.getAccount(primaryAccount.getAccountNumber());
-		secondaryAccount = primaryBranch.getAccount(secondaryAccount.getAccountNumber());
+		branch.execute(new TransferTransaction(transferAmount, primaryAccount, secondaryAccount));
+		primaryAccount = branch.getAccount(primaryAccount.getAccountNumber());
+		secondaryAccount = branch.getAccount(secondaryAccount.getAccountNumber());
 		assertEquals(remainingAmount, primaryAccount.getBalance());
-		assertEquals(hq.getExchangeRate("DKK", "EUR").exchange(transferAmount), secondaryAccount.getBalance());
+		assertEquals(branch.exchange(transferAmount, secondaryAccount.getSettledCurrency()), secondaryAccount.getBalance());
 	}
 }

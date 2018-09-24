@@ -1,4 +1,4 @@
-package betterbank_main;
+package bank.main;
 
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
@@ -8,7 +8,6 @@ import java.rmi.registry.Registry;
 
 import bank.RemoteBranch;
 import bank.RemoteHQ;
-import bank.dao.DataServiceImpl;
 import bank.dao.HeadQuarters;
 
 public class Main {
@@ -18,14 +17,12 @@ public class Main {
 		try {
 			return (T) registry.lookup(URI);
 		} catch (NotBoundException e) {
-			// How could this happen?
 			throw new RemoteException(e.getMessage(), e);
 		}
 	}
 	
 	public static void main(String[] args) throws Exception {
 		Registry registry = LocateRegistry.createRegistry(1099);
-		registry.rebind("dataservice", new DataServiceImpl());
 		HeadQuarters hq = bind(registry, "HQ", new RemoteHQ());
 		RemoteBranch branch1 = new RemoteBranch(1234, hq);
 		registry.rebind("Branch 1", branch1);

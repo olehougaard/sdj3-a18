@@ -23,7 +23,6 @@ import bank.model.transaction.WithdrawTransaction;
 public class RemoteBranch extends UnicastRemoteObject implements Branch, TransactionVisitor {
 	private static final long serialVersionUID = 1;
 	private int regNumber;
-	private long nextAccount = 1;
 	private AccountDAO accountDAO;
 	private CustomerDAO customerDAO;
 	private TransactionDAO transactionDAO;
@@ -49,11 +48,7 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 
 	@Override
 	public Account createAccount(Customer customer, String currency) throws RemoteException {
-		AccountNumber accountNumber;
-		synchronized(RemoteBranch.class) {
-			accountNumber = new AccountNumber(regNumber, nextAccount++);
-		}
-		return accountDAO.create(accountNumber, customer, currency);
+		return accountDAO.create(regNumber, customer, currency);
 	}
 
 	@Override
@@ -62,8 +57,8 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 	}
 	
 	@Override
-	public void cancelAccount(AccountNumber accountNumber) throws RemoteException {
-		accountDAO.delete(accountDAO.read(accountNumber));
+	public void cancelAccount(Account account) throws RemoteException {
+		accountDAO.delete(account);
 	}
 
 	@Override
@@ -87,7 +82,7 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 
 	@Override
 	public void visit(DepositTransaction transaction) throws RemoteException {
-		Account account = accountDAO.read(transaction.getAccountNumber());
+		Account account = accountDAO.read(transaction.getAccount().getAccountNumber());
 		Money amount = transaction.getAmount();
 		amount = translateToSettledCurrency(amount, account);
 		account.deposit(amount);
@@ -96,7 +91,7 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 	
 	@Override
 	public void visit(WithdrawTransaction transaction) throws RemoteException {
-		Account account = accountDAO.read(transaction.getAccountNumber());
+		Account account = accountDAO.read(transaction.getAccount().getAccountNumber());
 		Money amount = transaction.getAmount();
 		amount = translateToSettledCurrency(amount, account);
 		account.withdraw(amount);
@@ -107,5 +102,13 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 	public void visit(TransferTransaction transaction) throws RemoteException {
 		transaction.getDepositTransaction().accept(this);
 		transaction.getWithdrawTransaction().accept(this);
+	}
+	
+	@Override
+	public Money exchange(Money amount, String targetCurrency) throws RemoteException {
+		if (targetCurrency.equals(amount.getCurrency()))
+			return amount;
+		ExchangeRate rate = exchangeDAO.getExchangeRate(amount.getCurrency(), targetCurrency);
+		return rate.exchange(amount);
 	}
 }

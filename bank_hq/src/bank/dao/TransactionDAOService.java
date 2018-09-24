@@ -22,28 +22,34 @@ public class TransactionDAOService extends UnicastRemoteObject implements Transa
 	
 	private static final long serialVersionUID = 1L;
 	private DatabaseHelper<Transaction> helper;
+	private AccountDAO accounts;
 	
-	public TransactionDAOService(String jdbcURL, String username, String password) throws RemoteException {
-		helper = new DatabaseHelper<>(jdbcURL, username, password);
+	public TransactionDAOService(AccountDAO accounts, String jdbcURL, String username, String password) throws RemoteException {
+		this.accounts = accounts;
+		this.helper = new DatabaseHelper<>(jdbcURL, username, password);
 	}
 	
-	private static class TransactionMapper implements DataMapper<Transaction> {
+	private class TransactionMapper implements DataMapper<Transaction> {
 		@Override
-		public Transaction create(ResultSet rs) throws SQLException {
+		public Transaction create(ResultSet rs) throws SQLException, RemoteException {
 			Money amount = new Money(rs.getBigDecimal("amount"), rs.getString("currency"));
 			String text = rs.getString("transaction_text");
-			AccountNumber primaryAccount = new AccountNumber(rs.getInt("primary_reg_number"), rs.getLong("primary_account_number"));
+			Account primary = readAccount(rs, "primary_reg_number", "primary_account_number");
 			switch(rs.getString("transaction_type")) {
 			case DEPOSIT:
-				return new DepositTransaction(amount, primaryAccount, text);
+				return new DepositTransaction(amount, primary, text);
 			case WITHDRAWAL:
-				return new WithdrawTransaction(amount, primaryAccount, text);
+				return new WithdrawTransaction(amount, primary, text);
 			case TRANSFER:
-				AccountNumber secondaryAccount = new AccountNumber(rs.getInt("secondary_reg_number"), rs.getLong("secondary_account_number"));
-				return new TransferTransaction(amount, primaryAccount, secondaryAccount, text);
+				Account secondaryAccount = readAccount(rs, "secondary_reg_number", "secondary_account_number");
+				return new TransferTransaction(amount, primary, secondaryAccount, text);
 			default:
 				return null;
 			}
+		}
+
+		private Account readAccount(ResultSet rs, String regNumberAttr, String acctNumberAttr) throws SQLException, RemoteException {
+			return accounts.read(new AccountNumber(rs.getInt(regNumberAttr), rs.getLong(acctNumberAttr)));
 		}
 	}
 	
@@ -51,25 +57,25 @@ public class TransactionDAOService extends UnicastRemoteObject implements Transa
 		@Override
 		public void visit(DepositTransaction transaction) throws RemoteException {
 			Money amount = transaction.getAmount();
-			AccountNumber primaryAccount = transaction.getAccountNumber();
-			helper.executeUpdate("INSERT INTO Transaction(amount, currency, transaction_type, transaction_text, primary_reg_number, primary_account_number) VALUES (?, ?, ?, ?, ?)", 
+			AccountNumber primaryAccount = transaction.getAccount().getAccountNumber();
+			helper.executeUpdate("INSERT INTO Transaction(amount, currency, transaction_type, transaction_text, primary_reg_number, primary_account_number) VALUES (?, ?, ?, ?, ?, ?)", 
 					amount.getAmount(), amount.getCurrency(), DEPOSIT, transaction.getText(), primaryAccount.getRegNumber(), primaryAccount.getAccountNumber());
 		}
 
 		@Override
 		public void visit(WithdrawTransaction transaction) throws RemoteException {
 			Money amount = transaction.getAmount();
-			AccountNumber primaryAccount = transaction.getAccountNumber();
-			helper.executeUpdate("INSERT INTO Transaction(amount, currency, transaction_type, transaction_text, primary_reg_number, primary_account_number) VALUES (?, ?, ?, ?, ?)", 
+			AccountNumber primaryAccount = transaction.getAccount().getAccountNumber();
+			helper.executeUpdate("INSERT INTO Transaction(amount, currency, transaction_type, transaction_text, primary_reg_number, primary_account_number) VALUES (?, ?, ?, ?, ?, ?)", 
 					amount.getAmount(), amount.getCurrency(), WITHDRAWAL, transaction.getText(), primaryAccount.getRegNumber(), primaryAccount.getAccountNumber());
 		}
 
 		@Override
 		public void visit(TransferTransaction transaction) throws RemoteException {
 			Money amount = transaction.getAmount();
-			AccountNumber primaryAccount = transaction.getAccountNumber();
-			AccountNumber secondaryAccount = transaction.getRecipientNumber();
-			helper.executeUpdate("INSERT INTO Transaction(amount, currency, transaction_type, transaction_text, primary_reg_number, primary_account_number, secondary_reg_number, secondary_account_number) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+			AccountNumber primaryAccount = transaction.getAccount().getAccountNumber();
+			AccountNumber secondaryAccount = transaction.getRecipient().getAccountNumber();
+			helper.executeUpdate("INSERT INTO Transaction(amount, currency, transaction_type, transaction_text, primary_reg_number, primary_account_number, secondary_reg_number, secondary_account_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
 					amount.getAmount(), amount.getCurrency(), TRANSFER, transaction.getText(), primaryAccount.getRegNumber(), primaryAccount.getAccountNumber(), secondaryAccount.getRegNumber(), secondaryAccount.getAccountNumber());
 		}
 	}

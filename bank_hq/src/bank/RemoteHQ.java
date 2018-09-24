@@ -26,7 +26,7 @@ public class RemoteHQ extends UnicastRemoteObject implements HeadQuarters {
 
 	public RemoteHQ() throws RemoteException {
 		exchangeDao = new ExchangeRateDAOService(JDBC_URL, USERNAME, PASSWORD);
-		transactionDAOService = new TransactionDAOService(JDBC_URL, USERNAME, PASSWORD);
+		transactionDAOService = new TransactionDAOService(accountDAO, JDBC_URL, USERNAME, PASSWORD);
 		accountDAO = new AccountDAOService(JDBC_URL, USERNAME, PASSWORD, transactionDAOService);
 		customerDAO = new CustomerDAOService(JDBC_URL, USERNAME, PASSWORD, accountDAO);
 	}

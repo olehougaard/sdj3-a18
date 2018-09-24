@@ -5,7 +5,6 @@ import java.io.Serializable;
 public class Account implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private AccountNumber accountNumber;
-	private String currency;
 	private Money balance;
 
 	public Account(AccountNumber accountNumber, String currency) {
@@ -14,7 +13,6 @@ public class Account implements Serializable {
 
 	public Account(AccountNumber accountNumber, Money balance) {
 		this.accountNumber = accountNumber;
-		this.currency = balance.getCurrency();
 		this.balance = balance;
 	}
 
@@ -27,7 +25,7 @@ public class Account implements Serializable {
 	}
 
 	public String getSettledCurrency() {
-		return currency;
+		return balance.getCurrency();
 	}
 
 	public synchronized void deposit(Money amount) {

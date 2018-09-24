@@ -6,6 +6,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 import bank.model.Account;
 import bank.model.AccountNumber;
@@ -23,11 +24,11 @@ public class AccountDAOService extends UnicastRemoteObject implements AccountDAO
 	}
 
 	@Override
-	public Account create(AccountNumber accountNumber, Customer customer, String currency)
+	public Account create(int regNumber, Customer customer, String currency)
 			throws RemoteException {
-		helper.executeUpdate("INSERT INTO Account(reg_number, account_number, customer, currency) VALUES (?, ?, ?, ?)", 
-				accountNumber.getRegNumber(), accountNumber.getAccountNumber(), customer.getCpr(), currency);
-		return read(accountNumber);
+		final List<Integer> keys = helper.executeUpdateWithGeneratedKeys("INSERT INTO Account(reg_number, customer, currency) VALUES (?, ?, ?)", 
+				regNumber, customer.getCpr(), currency);
+		return read(new AccountNumber(regNumber, keys.get(0)));
 	}
 	
 	public static class AccountMapper implements DataMapper<Account>{
