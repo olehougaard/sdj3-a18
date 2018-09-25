@@ -82,7 +82,7 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 
 	@Override
 	public void visit(DepositTransaction transaction) throws RemoteException {
-		Account account = accountDAO.read(transaction.getAccount().getAccountNumber());
+		Account account = transaction.getAccount();
 		Money amount = transaction.getAmount();
 		amount = translateToSettledCurrency(amount, account);
 		account.deposit(amount);
@@ -91,7 +91,7 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 	
 	@Override
 	public void visit(WithdrawTransaction transaction) throws RemoteException {
-		Account account = accountDAO.read(transaction.getAccount().getAccountNumber());
+		Account account = transaction.getAccount();
 		Money amount = transaction.getAmount();
 		amount = translateToSettledCurrency(amount, account);
 		account.withdraw(amount);
@@ -100,8 +100,8 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 	
 	@Override
 	public void visit(TransferTransaction transaction) throws RemoteException {
-		transaction.getDepositTransaction().accept(this);
-		transaction.getWithdrawTransaction().accept(this);
+		visit(transaction.getDepositTransaction());
+		visit(transaction.getWithdrawTransaction());
 	}
 	
 	@Override
