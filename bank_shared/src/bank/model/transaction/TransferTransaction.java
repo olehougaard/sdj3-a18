@@ -11,8 +11,8 @@ public class TransferTransaction implements Transaction {
 	private DepositTransaction depositTransaction;
 	
 	public TransferTransaction(Money amount, Account account, Account recipient) {
-		this.withdrawTransaction = new WithdrawTransaction(amount, account, "Transfered " + amount + " to " + recipient);
-		this.depositTransaction = new DepositTransaction(amount, recipient, "Transfered" + amount + "from " + recipient);
+		this.withdrawTransaction = new WithdrawTransaction(amount, account, "Transferred " + amount + " to " + recipient);
+		this.depositTransaction = new DepositTransaction(amount, recipient, "Transferred" + amount + "from " + recipient);
 	}
 	
 	public TransferTransaction(Money amount, Account account, Account recipient, String text) {
