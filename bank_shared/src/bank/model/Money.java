@@ -40,13 +40,6 @@ public final class Money implements Serializable {
 		return new Money(amount.multiply(factor), currency);
 	}
 
-	public Money exchange(ExchangeRate rate) {
-		if (!rate.getFromCurrency().equals(currency)) {
-			throw new IllegalArgumentException("Wrong currency");
-		}
-		return new Money(amount.multiply(rate.getExchangeRate()), rate.getToCurrency());
-	}
-
 	@Override
 	public int hashCode() {
 		return amount.hashCode() ^ currency.hashCode();
