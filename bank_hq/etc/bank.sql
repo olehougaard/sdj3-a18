@@ -32,6 +32,7 @@ CREATE TABLE Account(
   customer CHAR(10) NOT NULL,
   balance MoneyAmount NOT NULL DEFAULT 0,
   currency Currency NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
   PRIMARY KEY (reg_number, account_number),
   FOREIGN KEY (reg_number) REFERENCES Branch(reg_number),
   FOREIGN KEY (customer) REFERENCES Customer(cpr));

@@ -93,7 +93,8 @@ public class TransactionDAOService extends UnicastRemoteObject implements Transa
 	}
 
 	@Override
-	public List<Transaction> readAllFor(AccountNumber accountNumber) throws RemoteException {
+	public List<Transaction> readAllFor(Account account) throws RemoteException {
+		AccountNumber accountNumber = account.getAccountNumber();
 		return helper.map(new TransactionMapper(), 
 				"SELECT * FROM Transaction WHERE (primary_reg_number = ? AND primary_account_number = ?) OR (secondary_reg_number = ? AND secondary_account_number = ?)",
 				accountNumber.getRegNumber(), accountNumber.getAccountNumber(),accountNumber.getRegNumber(), accountNumber.getAccountNumber());

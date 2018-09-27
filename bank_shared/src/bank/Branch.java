@@ -3,6 +3,7 @@ package bank;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.List;
 
 import bank.model.Account;
 import bank.model.AccountNumber;
@@ -19,4 +20,5 @@ public interface Branch extends Remote {
 	Collection<Account> getAccounts(Customer customer) throws RemoteException;
 	void execute(Transaction t) throws RemoteException;
 	Money exchange(Money amount, String targetCurrency) throws RemoteException;
+	List<Transaction> getTransactionsFor(Account account) throws RemoteException;
 }

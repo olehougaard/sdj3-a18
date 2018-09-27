@@ -16,10 +16,8 @@ import bank.model.Money;
 public class AccountDAOService extends UnicastRemoteObject implements AccountDAO {
 	private static final long serialVersionUID = 1L;
 	private DatabaseHelper<Account> helper;
-	private TransactionDAO transactionDAO;
 	
-	public AccountDAOService(String jdbcURL, String username, String password, TransactionDAO transactionDAO) throws RemoteException {
-		this.transactionDAO = transactionDAO;
+	public AccountDAOService(String jdbcURL, String username, String password) throws RemoteException {
 		helper = new DatabaseHelper<>(jdbcURL, username, password);
 	}
 
@@ -44,25 +42,24 @@ public class AccountDAOService extends UnicastRemoteObject implements AccountDAO
 
 	@Override
 	public Account read(AccountNumber accountNumber) throws RemoteException {
-		return helper.mapSingle(new AccountMapper(), "SELECT * FROM Account WHERE reg_number = ? AND account_number = ?", 
+		return helper.mapSingle(new AccountMapper(), "SELECT * FROM Account WHERE reg_number = ? AND account_number = ? AND active", 
 				accountNumber.getRegNumber(), accountNumber.getAccountNumber());
 	}
 
 	@Override
 	public Collection<Account> readAccountsFor(Customer customer) throws RemoteException {
-		return helper.map(new AccountMapper(), "SELECT * FROM Account WHERE customer = ?", customer.getCpr()) ;
+		return helper.map(new AccountMapper(), "SELECT * FROM Account WHERE customer = ? AND active", customer.getCpr()) ;
 	}
 
 	@Override
 	public void update(Account account) throws RemoteException {
-		helper.executeUpdate("UPDATE ACCOUNT SET balance = ?, currency = ? WHERE reg_number = ? AND account_number = ?", 
+		helper.executeUpdate("UPDATE ACCOUNT SET balance = ?, currency = ? WHERE reg_number = ? AND account_number = ? AND active", 
 				account.getBalance().getAmount(), account.getSettledCurrency(), account.getAccountNumber().getRegNumber(), account.getAccountNumber().getAccountNumber());
 	}
 
 	@Override
 	public void delete(Account account) throws RemoteException {
-		transactionDAO.deleteFor(account);
-		helper.executeUpdate("DELETE FROM ACCOUNT WHERE reg_number = ? AND account_number = ?", 
+		helper.executeUpdate("UPDATE ACCOUNT SET active = FALSE WHERE reg_number = ? AND account_number = ?", 
 				account.getAccountNumber().getRegNumber(), account.getAccountNumber().getAccountNumber());
 	}
 }

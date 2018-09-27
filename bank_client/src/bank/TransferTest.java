@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -16,6 +17,7 @@ import bank.model.Account;
 import bank.model.Customer;
 import bank.model.Money;
 import bank.model.transaction.DepositTransaction;
+import bank.model.transaction.Transaction;
 import bank.model.transaction.TransferTransaction;
 
 public class TransferTest {
@@ -45,6 +47,8 @@ public class TransferTest {
 		Money startingAmount = new Money(new BigDecimal(10000), "DKK");
 		Money transferAmount = new Money(new BigDecimal(1000), "DKK");
 		Money remainingAmount = new Money(new BigDecimal(9000), "DKK");
+		List<Transaction> primaryTransactionsBefore = branch.getTransactionsFor(primaryAccount);
+		List<Transaction> secondaryTransactionsBefore = branch.getTransactionsFor(secondaryAccount);
 		branch.execute(new DepositTransaction(startingAmount, primaryAccount));
 		primaryAccount = branch.getAccount(primaryAccount.getAccountNumber());
 		assertEquals(startingAmount, primaryAccount.getBalance());
@@ -53,5 +57,7 @@ public class TransferTest {
 		secondaryAccount = branch.getAccount(secondaryAccount.getAccountNumber());
 		assertEquals(remainingAmount, primaryAccount.getBalance());
 		assertEquals(branch.exchange(transferAmount, secondaryAccount.getSettledCurrency()), secondaryAccount.getBalance());
+		assertEquals(primaryTransactionsBefore.size() + 2, branch.getTransactionsFor(primaryAccount).size());
+		assertEquals(secondaryTransactionsBefore.size() + 1, branch.getTransactionsFor(secondaryAccount).size());
 	}
 }

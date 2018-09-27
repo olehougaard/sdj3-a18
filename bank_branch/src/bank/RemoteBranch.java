@@ -3,6 +3,7 @@ package bank;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Collection;
+import java.util.List;
 
 import bank.dao.AccountDAO;
 import bank.dao.CustomerDAO;
@@ -110,5 +111,10 @@ public class RemoteBranch extends UnicastRemoteObject implements Branch, Transac
 			return amount;
 		ExchangeRate rate = exchangeDAO.getExchangeRate(amount.getCurrency(), targetCurrency);
 		return rate.exchange(amount);
+	}
+	
+	@Override
+	public List<Transaction> getTransactionsFor(Account primaryAccount) throws RemoteException {
+		return transactionDAO.readAllFor(primaryAccount);
 	}
 }
