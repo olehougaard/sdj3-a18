@@ -15,7 +15,7 @@ public class CommunicationModule {
 	
 	public static void main(String[] args) throws Exception {
 		TaskList list = new TaskList();
-		listen(new Skeleton(list));
+		listen(new TaskSkeleton(list));
 	}
 
 	private static void listen(Skeleton skeleton) throws IOException {
