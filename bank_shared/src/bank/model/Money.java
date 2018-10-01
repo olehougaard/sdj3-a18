@@ -27,12 +27,12 @@ public final class Money implements Serializable {
 	}
 
 	public Money add(Money that) {
-		assert currency.equals(that.getCurrency());
+		if (!currency.equals(that.getCurrency())) throw new IllegalArgumentException();
 		return new Money(this.amount.add(that.amount), currency);
 	}
 
 	public Money subtract(Money that) {
-		assert currency.equals(that.getCurrency());
+		if (!currency.equals(that.getCurrency())) throw new IllegalArgumentException();
 		return new Money(this.amount.subtract(that.amount), currency);
 	}
 

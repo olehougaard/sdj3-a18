@@ -1,4 +1,4 @@
-package dk.via.tasks.rpc;
+package dk.via.tasks.rmi;
 
 import java.io.Serializable;
 

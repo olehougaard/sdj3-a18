@@ -1,10 +1,10 @@
-package dk.via.tasks.rpc.server;
+package dk.via.tasks.rmi.server;
 
 import java.io.Serializable;
 
 import dk.via.tasks.Task;
 import dk.via.tasks.TaskList;
-import dk.via.tasks.rpc.Message;
+import dk.via.tasks.rmi.Message;
 
 public class Skeleton {
 	private TaskList tasks;

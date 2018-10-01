@@ -1,7 +1,7 @@
 import java.rmi.RemoteException;
 
 import dk.via.tasks.Task;
-import dk.via.tasks.rpc.client.Proxy;
+import dk.via.tasks.rmi.client.Proxy;
 
 public class Test {
 	public static void main(String[] args) throws RemoteException {

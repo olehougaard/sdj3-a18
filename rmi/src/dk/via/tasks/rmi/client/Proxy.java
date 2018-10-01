@@ -1,16 +1,16 @@
-package dk.via.tasks.rpc.client;
+package dk.via.tasks.rmi.client;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import dk.via.tasks.Task;
-import dk.via.tasks.rpc.Message;
-import dk.via.tasks.rpc.TaskListInterface;
+import dk.via.tasks.rmi.Message;
+import dk.via.tasks.rmi.TaskListInterface;
 
 public class Proxy implements TaskListInterface {
 	private Serializable call(String message, Serializable... args) throws RemoteException {
 		final String method = message;
-		Serializable reply = CommunicationModule.request(new Message(method, args));
+		Serializable reply = CommunicationModule.doOperation(new Message(method, args));
 		if (reply instanceof Exception) {
 			Exception e = (Exception) reply;
 			throw new RemoteException(e.getMessage(), e);

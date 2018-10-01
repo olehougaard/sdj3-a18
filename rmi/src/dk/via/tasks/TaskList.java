@@ -2,7 +2,7 @@ package dk.via.tasks;
 
 import java.util.ArrayList;
 
-import dk.via.tasks.rpc.TaskListInterface;
+import dk.via.tasks.rmi.TaskListInterface;
 
 public class TaskList implements TaskListInterface {
 	private ArrayList<Task> tasks;
