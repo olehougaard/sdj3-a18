@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import dk.via.tasks.rmi.Message;
 
-public interface Skeleton {
+public interface Recepient {
 
 	Serializable interpret(Message message);
 

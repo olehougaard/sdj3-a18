@@ -15,10 +15,10 @@ public class CommunicationModule {
 	
 	public static void main(String[] args) throws Exception {
 		TaskList list = new TaskList();
-		listen(new TaskSkeleton(list));
+		listen(new TaskDispatcher(list));
 	}
 
-	private static void listen(Skeleton skeleton) throws IOException {
+	private static void listen(Recepient recepient) throws IOException {
 		@SuppressWarnings("resource") // Main socket is open until server shuts down.
 		ServerSocket socket = new ServerSocket(PORT);
 		while (true) {
@@ -28,7 +28,7 @@ public class CommunicationModule {
 				Object objectIn = ois.readObject();
 				if (objectIn instanceof Message) {
 					try {
-						Serializable result = skeleton.interpret((Message) objectIn);
+						Serializable result = recepient.interpret((Message) objectIn);
 						oos.writeObject(result);
 					} catch (Throwable e) {
 						oos.writeObject(e);

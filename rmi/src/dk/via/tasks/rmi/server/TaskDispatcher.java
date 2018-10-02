@@ -6,10 +6,10 @@ import dk.via.tasks.Task;
 import dk.via.tasks.TaskList;
 import dk.via.tasks.rmi.Message;
 
-public class TaskSkeleton implements Skeleton {
+public class TaskDispatcher implements Recepient {
 	private TaskList tasks;
 	
-	public TaskSkeleton(TaskList tasks) {
+	public TaskDispatcher(TaskList tasks) {
 		this.tasks = tasks;
 	}
 	
