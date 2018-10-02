@@ -1,4 +1,4 @@
-package dk.via.tasks.rmi;
+package dk.via.requestreply;
 
 import java.io.Serializable;
 

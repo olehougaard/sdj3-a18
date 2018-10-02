@@ -2,9 +2,10 @@ package dk.via.tasks.rmi.server;
 
 import java.io.Serializable;
 
+import dk.via.requestreply.Message;
+import dk.via.requestreply.server.Recepient;
 import dk.via.tasks.Task;
 import dk.via.tasks.TaskList;
-import dk.via.tasks.rmi.Message;
 
 public class TaskDispatcher implements Recepient {
 	private TaskList tasks;

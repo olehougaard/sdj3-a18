@@ -1,8 +1,8 @@
-package dk.via.tasks.rmi.server;
+package dk.via.requestreply.server;
 
 import java.io.Serializable;
 
-import dk.via.tasks.rmi.Message;
+import dk.via.requestreply.Message;
 
 public interface Recepient {
 
