@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import dk.via.requestreply.Message;
 
-public interface Recepient {
+public interface Recipient {
 
 	Serializable interpret(Message message);
 

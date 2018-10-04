@@ -19,7 +19,7 @@ public class CommunicationModule {
 		listen(new TaskDispatcher(list));
 	}
 
-	private static void listen(Recepient recepient) throws IOException {
+	private static void listen(Recipient recipient) throws IOException {
 		@SuppressWarnings("resource") // Main socket is open until server shuts down.
 		ServerSocket socket = new ServerSocket(PORT);
 		while (true) {
@@ -29,7 +29,7 @@ public class CommunicationModule {
 				Object objectIn = ois.readObject();
 				if (objectIn instanceof Message) {
 					try {
-						Serializable result = recepient.interpret((Message) objectIn);
+						Serializable result = recipient.interpret((Message) objectIn);
 						oos.writeObject(result);
 					} catch (Throwable e) {
 						oos.writeObject(e);
