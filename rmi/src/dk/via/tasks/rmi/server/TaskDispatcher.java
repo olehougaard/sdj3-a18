@@ -1,15 +1,13 @@
 package dk.via.tasks.rmi.server;
 
+import java.io.IOException;
 import java.io.Serializable;
 
-import dk.via.requestreply.ExceptionResponse;
 import dk.via.requestreply.Message;
-import dk.via.requestreply.Response;
-import dk.via.requestreply.ValueResponse;
-import dk.via.requestreply.VoidResponse;
 import dk.via.requestreply.server.Recipient;
 import dk.via.tasks.Task;
 import dk.via.tasks.TaskList;
+import dk.via.util.ByteConverter;
 
 public class TaskDispatcher implements Recipient {
 	private TaskList tasks;
@@ -19,30 +17,40 @@ public class TaskDispatcher implements Recipient {
 	}
 	
 	@SafeVarargs
-	private final void checkArgs(Serializable[] args, Class<? extends Serializable>... expected) {
+	private final Serializable[] unmarshal(byte[][] args, Class<? extends Serializable>... expected) {
 		if (args == null || args.length != expected.length) throw new IllegalArgumentException("Wrong number of arguments: " + args.length);
+		Serializable[] sar = new Serializable[args.length];
 		for(int i = 0; i < args.length; i++) {
-			if (!expected[i].isInstance(args[i])) throw new IllegalArgumentException("Incompatible argument type");
+			try {
+				sar[i] = ByteConverter.serializableFromByteArray(args[i]);
+			} catch (ClassNotFoundException | IOException e) {
+				throw new IllegalArgumentException(e);
+			}
+			if (!expected[i].isInstance(sar[i])) throw new IllegalArgumentException("Incompatible argument type");
 		}
+		return sar;
 	}
-
+	
 	@Override
-	public Response interpret(Message message) {
+	public byte[] interpret(Message message) {
 		final String method = message.getMethod();
-		final Serializable[] args = message.getArgs();
+		final byte[][] args = message.getArgs();
 		switch(method) {
-		case "add":
-			checkArgs(args, Task.class);
-			tasks.add((Task) args[0]);
-			return VoidResponse.VOID;
-		case "getAndRemoveNextTask":
-			checkArgs(args);
-			return new ValueResponse(tasks.getAndRemoveNextTask());
-		case "size":
-			checkArgs(args);
-			return new ValueResponse(tasks.size());
+		case "add": {
+			Serializable[] unmarshalled = unmarshal(args, Task.class);
+			tasks.add((Task) unmarshalled[0]);
+			return new byte[0];
+		}
+		case "getAndRemoveNextTask": {
+			unmarshal(args);
+			return ByteConverter.toByteArray(tasks.getAndRemoveNextTask());
+		}
+		case "size": {
+			unmarshal(args);
+			return ByteConverter.toByteArray(tasks.size());
+		}
 		default:
-			return new ExceptionResponse(new IllegalArgumentException("Invalid method"));	
+			return ByteConverter.toByteArray(new IllegalArgumentException("Invalid method"));	
 		}
 	}
 }

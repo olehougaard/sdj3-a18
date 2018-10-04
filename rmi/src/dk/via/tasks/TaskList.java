@@ -14,11 +14,14 @@ public class TaskList implements TaskListInterface {
 	@Override
 	public void add(Task task) {
 		tasks.add(task);
+		System.out.println("tasks: " + tasks);
 	}
 	
 	@Override
 	public Task getAndRemoveNextTask() {
-		return tasks.remove(0);
+		Task r = tasks.remove(0);
+		System.out.println("tasks: " + tasks);
+		return r;
 	}
 	
 	@Override

@@ -6,11 +6,11 @@ public class Message implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String method;
-	private Serializable[] args;
+	private byte[][] args;
 	
 	public static final Message VOID = new Message("VOID");
 	
-	public Message(String method, Serializable... args) {
+	public Message(String method, byte[]... args) {
 		this.method = method;
 		this.args = args;
 	}
@@ -19,7 +19,7 @@ public class Message implements Serializable {
 		return method;
 	}
 
-	public Serializable[] getArgs() {
+	public byte[][] getArgs() {
 		return args;
 	}
 }
