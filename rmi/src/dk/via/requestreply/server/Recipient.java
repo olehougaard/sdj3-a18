@@ -1,11 +1,10 @@
 package dk.via.requestreply.server;
 
-import java.io.Serializable;
-
 import dk.via.requestreply.Message;
+import dk.via.requestreply.Response;
 
 public interface Recipient {
 
-	Serializable interpret(Message message);
+	Response interpret(Message message);
 
 }

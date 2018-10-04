@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.rmi.RemoteException;
 
 import dk.via.requestreply.Message;
+import dk.via.requestreply.Response;
 
 public class CommunicationModule {
 	public static final int PORT = 9090;
@@ -16,8 +17,8 @@ public class CommunicationModule {
 				ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream())) {
 			oos.writeObject(msg);
 			try (ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())) {
-				final Object reply = ois.readObject();
-				return (Serializable) reply;
+				final Response reply = (Response) ois.readObject();
+				return reply.getValue();
 			}
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage(), e);
