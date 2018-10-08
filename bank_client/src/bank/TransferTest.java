@@ -27,7 +27,7 @@ public class TransferTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Registry registry = LocateRegistry.getRegistry(1099);
+		Registry registry = LocateRegistry.getRegistry(8099);
 		branch = (Branch) registry.lookup("Branch 1");
 		Customer customer = branch.getCustomer("1234567890");
 		primaryAccount = branch.createAccount(customer, "DKK");
