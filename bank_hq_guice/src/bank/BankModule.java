@@ -1,7 +1,6 @@
 package bank;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 
 import bank.dao.AccountDAO;
 import bank.dao.AccountDAOService;
@@ -16,22 +15,17 @@ import bank.dao.TransactionDAO;
 import bank.dao.TransactionDAOService;
 
 public class BankModule extends AbstractModule {
-	private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres?currentSchema=bank";
-	private static final String USERNAME = "postgres";
-	private static final String PASSWORD = "password";
-
 	@Override
 	protected void configure() {
+		bind(String.class).annotatedWith(JdbcUrl.class).toInstance("jdbc:postgresql://localhost:5432/postgres?currentSchema=bank");
+		bind(String.class).annotatedWith(Username.class).toInstance("postgres");
+		bind(String.class).annotatedWith(Password.class).toInstance("password");
+		
+		bind(DataProvider.class).to(HelperProvider.class);
 		bind(ExchangeRateDAO.class).to(ExchangeRateDAOService.class);
 		bind(AccountDAO.class).to(AccountDAOService.class);
 		bind(TransactionDAO.class).to(TransactionDAOService.class);
 		bind(CustomerDAO.class).to(CustomerDAOService.class);
 		bind(HeadQuarters.class).to(RemoteHQ.class);
 	}
-	
-	@Provides
-	DataProvider provideDataHelper() {
-		return new HelperProvider(JDBC_URL, USERNAME, PASSWORD);
-	}
-
 }
