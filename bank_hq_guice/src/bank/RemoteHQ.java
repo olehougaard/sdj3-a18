@@ -3,6 +3,8 @@ package bank;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import com.google.inject.Inject;
+
 import bank.dao.AccountDAO;
 import bank.dao.CustomerDAO;
 import bank.dao.ExchangeRateDAO;
@@ -17,6 +19,7 @@ public class RemoteHQ extends UnicastRemoteObject implements HeadQuarters {
 	private CustomerDAO customerDAO;
 	private TransactionDAO transactionDAO;
 
+	@Inject
 	public RemoteHQ(ExchangeRateDAO exchangeDAO, AccountDAO accountDAO, TransactionDAO transactionDAO, CustomerDAO customerDAO) throws RemoteException {
 		this.exchangeDAO = exchangeDAO;
 		this.accountDAO = accountDAO;

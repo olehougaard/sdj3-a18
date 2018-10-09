@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.inject.Inject;
+
 import bank.model.Account;
 import bank.model.AccountNumber;
 import bank.model.Customer;
@@ -17,6 +19,7 @@ public class AccountDAOService extends UnicastRemoteObject implements AccountDAO
 	private static final long serialVersionUID = 1L;
 	private DataHelper<Account> helper;
 	
+	@Inject
 	public AccountDAOService(DataProvider provider) throws RemoteException {
 		helper = provider.createHelper(Account.class);
 	}

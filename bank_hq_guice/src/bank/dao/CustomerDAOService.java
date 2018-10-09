@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import com.google.inject.Inject;
+
 import bank.model.Account;
 import bank.model.Customer;
 
@@ -14,6 +16,7 @@ public class CustomerDAOService extends UnicastRemoteObject implements CustomerD
 	private DataHelper<Customer> helper;
 	private AccountDAO accountDAO;
 	
+	@Inject
 	public CustomerDAOService(AccountDAO accountDAO, DataProvider provider) throws RemoteException {
 		this.accountDAO = accountDAO;
 		this.helper = provider.createHelper(Customer.class);

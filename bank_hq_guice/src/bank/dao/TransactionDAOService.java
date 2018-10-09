@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.google.inject.Inject;
+
 import bank.model.Account;
 import bank.model.AccountNumber;
 import bank.model.Money;
@@ -24,6 +26,7 @@ public class TransactionDAOService extends UnicastRemoteObject implements Transa
 	private DataHelper<Transaction> helper;
 	private AccountDAO accounts;
 	
+	@Inject
 	public TransactionDAOService(AccountDAO accounts, DataProvider provider) throws RemoteException {
 		this.accounts = accounts;
 		this.helper = provider.createHelper(Transaction.class);

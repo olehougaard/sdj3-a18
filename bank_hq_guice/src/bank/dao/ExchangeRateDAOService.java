@@ -4,12 +4,15 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import com.google.inject.Inject;
+
 import bank.model.ExchangeRate;
 
 public class ExchangeRateDAOService extends UnicastRemoteObject implements ExchangeRateDAO {
 	private static final long serialVersionUID = 1L;
 	private DataHelper<BigDecimal> helper;
 
+	@Inject
 	public ExchangeRateDAOService(DataProvider provider) throws RemoteException {
 		helper = provider.createHelper(BigDecimal.class);
 	}
