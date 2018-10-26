@@ -38,9 +38,13 @@ public class Skeleton {
 	}
 	
 	public byte[] add(byte[][] args) {
-		Serializable[] unmarshalled = unmarshal(args, Task.class);
-		tasks.add((Task) unmarshalled[0]);
-		return new byte[0];
+		try {
+			Serializable[] unmarshalled = unmarshal(args, Task.class);
+			tasks.add((Task) unmarshalled[0]);
+			return new byte[0];
+		} catch (Exception e) {
+			return ByteConverter.toByteArray(e);
+		}
 	}
 	
 	public byte[] getAndRemoteNextTask(byte[][] args) {
