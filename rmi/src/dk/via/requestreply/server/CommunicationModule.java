@@ -9,6 +9,7 @@ import java.net.Socket;
 
 import dk.via.requestreply.Message;
 import dk.via.tasks.TaskList;
+import dk.via.tasks.rmi.server.Skeleton;
 import dk.via.tasks.rmi.server.TaskDispatcher;
 
 public class CommunicationModule {
@@ -16,7 +17,9 @@ public class CommunicationModule {
 	
 	public static void main(String[] args) throws Exception {
 		TaskList list = new TaskList();
-		listen(new TaskDispatcher(list));
+		Skeleton skeleton = new Skeleton(list);
+		TaskDispatcher dispatcher = new TaskDispatcher(skeleton);
+		listen(dispatcher);
 	}
 
 	private static void listen(Recipient recipient) throws IOException {
