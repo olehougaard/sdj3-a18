@@ -7,14 +7,17 @@ import dk.via.user.Email;
 import dk.via.user.User;
 
 public class UserDAO {
-	private static ArrayList<User> users = new ArrayList<>();
-	private static ArrayList<Email> emails = new ArrayList<>();
 	private static UserDAO instance = new UserDAO();
 
+	private ArrayList<User> users;
+	private ArrayList<Email> emails;
+
 	private UserDAO() {
+		users = new ArrayList<>();
 		users.add(new User(0, "abc@example.com", "1234abcd"));
 		users.add(new User(1, "def@hotmail.com", "password"));
 		
+		emails = new ArrayList<>();
 		emails.add(new Email(users.get(0), users.get(1), new Date(), "Hello"));
 	}
 	
