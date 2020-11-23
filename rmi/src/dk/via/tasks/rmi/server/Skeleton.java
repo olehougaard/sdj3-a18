@@ -16,7 +16,8 @@ public class Skeleton {
 
 	@SafeVarargs
 	private final Serializable[] unmarshal(byte[][] args, Class<? extends Serializable>... expected) {
-		if (args == null || args.length != expected.length) throw new IllegalArgumentException("Wrong number of arguments: " + args.length);
+		if (args == null) throw new NullPointerException();
+		if (args.length != expected.length) throw new IllegalArgumentException("Wrong number of arguments: " + args.length);
 		Serializable[] sar = new Serializable[args.length];
 		for(int i = 0; i < args.length; i++) {
 			try {
